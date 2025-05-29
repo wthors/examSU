@@ -1,0 +1,14 @@
+Map:
+##--##  
+##--##
+Map/
+
+Meta:
+Name: Test Level
+Time: 180
+Meta/
+
+Legend:
+# = green-block.png
+- = teal-block.png
+Legend/

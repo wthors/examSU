@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+<ItemGroup>
+  <ProjectReference Include="..\DIKUArcade\DIKUArcade\DIKUArcade.csproj" />
+</ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <RootNamespace>Breakout</RootNamespace>
+    <AssemblyName>Breakout</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+
+<PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+
+ <ItemGroup>
+    
+    <EmbeddedResource Include="Assets\**\*.png"/>
+    <EmbeddedResource Include="Assets\**\*.txt"/>
+  </ItemGroup>
+
+
+</Project>
