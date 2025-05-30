@@ -2,6 +2,7 @@ namespace Breakout.Hazards;
 
 using System.Collections.Generic;
 using System.Numerics;
+using Breakout.States;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 
@@ -62,6 +63,17 @@ public class Hazard : Entity {
         // Check if the hazard has moved off the screen
         if (Shape.Position.Y < 0.0f) {
             IsAlive = false;
+        }
+    }
+
+    public void Activate(GameRunning state) {
+        switch (Type) {
+            case HazardType.LoseLife:
+                state.LoseLife();
+                break;
+            case HazardType.ReduceTime:
+                state.AddTime(-10);
+                break;
         }
     }
 

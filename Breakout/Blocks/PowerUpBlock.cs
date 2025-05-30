@@ -13,5 +13,5 @@ public class PowerUpBlock : BlockBase {
 
     public override void DecreaseHealth() {
         base.DecreaseHealth();
-        }
     }
+}

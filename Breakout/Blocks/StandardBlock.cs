@@ -7,5 +7,5 @@ public class StandardBlock : BlockBase {
         : base(shape, healthyImage, health: 1, value: 10) { }
     public override void DecreaseHealth() {
         base.DecreaseHealth();
-        }
     }
+}

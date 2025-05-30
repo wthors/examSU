@@ -40,7 +40,7 @@ public class PowerUp : Entity {
         var powerUp = new PowerUp(shape, image, randomType);
         return powerUp;
     }
-    
+
 
     public void Move() {
         Shape.AsDynamicShape().Velocity = fallingSpeed;
@@ -49,9 +49,7 @@ public class PowerUp : Entity {
     public void Activate(GameRunning state) {
         switch (type) {
             case PowerUpType.GainLife:
-                if (state._lives < 3) {
-                    state._lives++;
-                }
+                state.GainLife();
                 break;
             case PowerUpType.MoreTime:
                 state.AddTime(10);
