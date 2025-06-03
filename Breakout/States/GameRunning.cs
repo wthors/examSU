@@ -3,10 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Security.Cryptography.X509Certificates;
 using Breakout.Balls;
 using Breakout.Blocks;
-using Breakout.Hazards;
 using Breakout.Level;
 using Breakout.Managers;
 using Breakout.Points;
@@ -15,7 +13,6 @@ using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Input;
-using DIKUArcade.Physics;
 using DIKUArcade.Timers;
 
 public class GameRunning : IGameState {
@@ -47,6 +44,7 @@ public class GameRunning : IGameState {
     private readonly PointTracker pointTracker;
     private readonly List<IBlock> _blocks;
     private List<Ball> activeBalls = new List<Ball>();
+    private CollisionManager _collisionManager;
 
     public int _lives;
     private readonly bool _hasTimer;
@@ -72,8 +70,7 @@ public class GameRunning : IGameState {
         var director = new LevelDirector(builder);
         _levelService = new LevelService(director);
         _blocks = _levelService.GetBlocks(_levelNumber);
-        _hazardManager = new HazardManager(_blocks, HazardChance);
-        _powerUpManager = new PowerUpManager(_blocks);
+
 
 
 
@@ -98,6 +95,11 @@ public class GameRunning : IGameState {
             new DynamicShape(new Vector2(0.45f, 0.025f), new Vector2(0.2f, 0.03f)),
             new Image("Breakout.Assets.Images.player.png")
         );
+
+        //initialize managers
+        _hazardManager = new HazardManager(_blocks, HazardChance);
+        _powerUpManager = new PowerUpManager(_blocks);
+        _collisionManager = new CollisionManager(activeBalls, _blocks, _player, pointTracker);
     }
 
 
@@ -143,53 +145,18 @@ public class GameRunning : IGameState {
                 activeBalls[i].Move();
             }
         }
-        // Bounce balls off screen edges
-        foreach (var ball in activeBalls) {
-            if (ball.Shape.Position.X <= 0.0f ||
-                ball.Shape.Position.X + ball.Shape.Extent.X >= 1.0f) {
-                ball.ReflectHorizontal();
-            }
-            if (ball.Shape.Position.Y + ball.Shape.Extent.Y >= 1.0f) {
-                ball.ReflectVertical();
-            }
-        }
-        // Handle ball-paddle collisions
-        foreach (var ball in activeBalls) {
-            if (CollisionDetection.Aabb(ball.Shape.AsDynamicShape(), _player.Shape.AsDynamicShape()).Collision) {
-                ball.ReflectVertical();
-            }
-        }
-        // Handle ball-block collisions
-        foreach (var ball in activeBalls) {
-            var ballDyn = ball.Shape.AsDynamicShape();
-            foreach (var block in _blocks) {
-                if (!block.IsAlive)
-                    continue;
-                var blockDyn = block.Shape.AsDynamicShape();
-                var colData = CollisionDetection.Aabb(ballDyn, blockDyn);
-                if (colData.Collision) {
-                    if (colData.CollisionDir == CollisionDirection.CollisionDirLeft ||
-                        colData.CollisionDir == CollisionDirection.CollisionDirRight) {
-                        ball.ReflectHorizontal();
-                    } else {
-                        ball.ReflectVertical();
-                    }
-                    block.DecreaseHealth();
-                    if (!block.IsAlive) {
-                        pointTracker.AddPoints(block.GetValue());
-                    }
-                    break;
-                }
-            }
-        }
+
+        // Check collisions for balls, player, and blocks
+        _collisionManager.Update();
+
         // Update hazards and check for hazard-player collisions
         _hazardManager.Update(this);
         if (_lives == 0)
             return;
-        // Update power-up spawns
+        // Update power-up and check for power-up-player collisions
         _powerUpManager.Update(this);
 
-        
+
         // Countdown timer if active
         if (_hasTimer) {
             long elapsed = StaticTimer.GetElapsedMilliseconds();
@@ -235,19 +202,7 @@ public class GameRunning : IGameState {
             }
             return;
         }
-        // Move active power-ups and handle power-up collection
-        for (int i = activePowerUps.Count - 1; i >= 0; i--) {
-            var powerUp = activePowerUps[i];
-            powerUp.Move();
-            if (powerUp.Shape.Position.Y <= 0.0f) {
-                activePowerUps.RemoveAt(i);
-                continue;
-            }
-            if (CollisionDetection.Aabb(powerUp.Shape.AsDynamicShape(), _player.Shape.AsDynamicShape()).Collision) {
-                powerUp.Activate(this);
-                activePowerUps.RemoveAt(i);
-            }
-        }
+
     }
 
     public void HandleKeyEvent(KeyboardAction action, KeyboardKey key) {
@@ -302,14 +257,14 @@ public class GameRunning : IGameState {
         _ball.SetSpeedMultiplier(multiplier);
     }
 
-    private Ball CreateBall() {
+    public Ball CreateBall() {
         return new Ball(
             new DynamicShape(new Vector2(0.5f, 0.1f), new Vector2(0.025f, 0.025f)),
             _ballImage,
             _ballSpeed
         );
     }
-    
+
     public void SplitBalls() {
         var newBalls = new List<Ball>();
         foreach (var ball in activeBalls) {

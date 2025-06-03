@@ -38,19 +38,19 @@ public class PowerUpTests {
     [Test]
     public void Move_ShouldApplyFallingSpeedToPositionAndVelocity() {
         var startPos = new Vector2(0.5f, 0.9f);
-            var pu = PowerUp.SpawnPowerUp(startPos);
-            var expected = pu.fallingSpeed;
+        var pu = PowerUp.SpawnPowerUp(startPos);
+        var expected = pu.fallingSpeed;
 
-            // Act
-            pu.Move();
+        // Act
+        pu.Move();
 
-            // Assert
-            var dyn = pu.Shape.AsDynamicShape();
-            Assert.AreEqual(expected, dyn.Velocity,
-                "Move() must set the shape’s Velocity to fallingSpeed"); 
-            Assert.AreEqual(startPos + expected, dyn.Position,
-                "Move() must offset position by fallingSpeed");
-        }
+        // Assert
+        var dyn = pu.Shape.AsDynamicShape();
+        Assert.AreEqual(expected, dyn.Velocity,
+            "Move() must set the shape’s Velocity to fallingSpeed");
+        Assert.AreEqual(startPos + expected, dyn.Position,
+            "Move() must offset position by fallingSpeed");
+    }
 
     [Test]
     public void SpawnPowerUp_ShouldReturnPowerUpAtGivenPosition() {
