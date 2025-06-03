@@ -3,7 +3,6 @@ using System;
 using System.Numerics;
 using Breakout.States;
 using DIKUArcade.Entities;
-using DIKUArcade.Events;
 using DIKUArcade.Graphics;
 public enum PowerUpType {
     GainLife,

@@ -1,4 +1,4 @@
-namespace BreakoutTests.Entitytests;
+namespace BreakoutTests.EntityTests;
 
 using System.Numerics;
 using Breakout.Hazards;

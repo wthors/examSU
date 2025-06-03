@@ -15,8 +15,7 @@ public class BlockTests {
             new Vector2(0.0f, 0.1f),
             new Vector2(0.1f, 0.1f)
         );
-        //Console.WriteLine(Path.GetFullPath("Assets/Images/blue-block.png"));
-        var image = new NoImage(); //new Image("Assets/Images/blue-block.png");
+        var image = new NoImage();
         var dmgimage = new NoImage();
         var block = new HardenedBlock(shape, image, dmgimage);
 

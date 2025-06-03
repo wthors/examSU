@@ -3,7 +3,6 @@ namespace Breakout.Balls;
 using System;
 using System.Numerics;
 using DIKUArcade.Entities;
-using DIKUArcade.Events;
 using DIKUArcade.Graphics;
 
 public class Ball : Entity {

@@ -1,6 +1,5 @@
 ﻿namespace Breakout;
 
-using System;
 using DIKUArcade.GUI;
 
 class Program {

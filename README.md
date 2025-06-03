@@ -41,11 +41,16 @@ The current version includes:
 1. Navigate to the `Breakout` folder:
    ```bash
    cd Breakout
+``
+
 ### AI Usage 
 <pr> Le Chat - Mistral AI and chatgpt was used to answer questions about:<ul>
-    <li>Csharp coding</li>
+    <li>C# coding</li>
     <li>Design patterns</li>
     <li>Troubleshooting (when code failed, a screenshot was sent to Le Chat and ChatGPT with questions to help understand what went wrong)</li>
+    </ul>
+</pr>
+
 
 <pr> AI was not used to write code directly for this assignment.
 All solutions were independently implemented, tested, and reviewed by the group. Any AI-assisted suggestions were critically evaluated and adapted to the course requirements.</pr>

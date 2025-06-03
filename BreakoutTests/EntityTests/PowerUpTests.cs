@@ -26,7 +26,6 @@ public class PowerUpTests {
 
     [SetUp]
     public void SetUp() {
-        GameRunning.activePowerUps.Clear();
         timeField = typeof(GameRunning).GetField("_timeRemaining", BindingFlags.NonPublic | BindingFlags.Instance);
         playerField = typeof(GameRunning).GetField("_player", BindingFlags.NonPublic | BindingFlags.Instance);
         playerSpeedMultField = typeof(Player).GetField("speedMultiplier", BindingFlags.NonPublic | BindingFlags.Instance);

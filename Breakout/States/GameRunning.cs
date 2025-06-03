@@ -8,7 +8,6 @@ using Breakout.Blocks;
 using Breakout.Level;
 using Breakout.Managers;
 using Breakout.Points;
-using Breakout.PowerUps;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
@@ -50,7 +49,6 @@ public class GameRunning : IGameState {
     private readonly bool _hasTimer;
     private int _timeRemaining;
     private long _lastTickTime;
-    public static List<PowerUp> activePowerUps = new List<PowerUp>();
 
     private static readonly Random random = new Random();
 
@@ -244,11 +242,8 @@ public class GameRunning : IGameState {
         }
     }
 
-    public void AddPowerUp(PowerUp powerUp) {
-        activePowerUps.Add(powerUp);
-    }
     public void AddTime(int seconds) {
-        _timeRemaining += seconds;
+        _timeRemaining = Math.Max(0, _timeRemaining + seconds);
     }
     public void IncreasePaddleSpeed(float multiplier = 1.5f) {
         _player.SetSpeedMultiplier(multiplier);

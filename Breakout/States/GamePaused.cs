@@ -1,6 +1,5 @@
 namespace Breakout.States;
 using System.Numerics;
-using System.Reflection;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.GUI;

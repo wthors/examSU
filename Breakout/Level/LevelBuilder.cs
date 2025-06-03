@@ -4,6 +4,7 @@ using System.Numerics;
 using Breakout.Blocks;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
+using System.IO;
 
 /// <summary>
 /// The AdvancedLevelBuilder class implements the ILevelBuilder interface.
