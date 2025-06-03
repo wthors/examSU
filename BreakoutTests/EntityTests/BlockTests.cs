@@ -24,4 +24,20 @@ public class BlockTests {
 
         Assert.AreEqual(1, block.Health);
     }
+
+    [Test]
+    public void BlockDestroyedAfterTwoHits() {
+        var shape = new StationaryShape(
+            new Vector2(0.0f, 0.1f),
+            new Vector2(0.1f, 0.1f)
+        );
+        var image = new NoImage();
+        var dmgimage = new NoImage();
+        var block = new HardenedBlock(shape, image, dmgimage);
+
+        block.DecreaseHealth();
+        block.DecreaseHealth();
+
+        Assert.IsFalse(block.IsAlive);
+    }
 }

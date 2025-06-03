@@ -19,7 +19,7 @@
     <ProjectReference Include="..\Breakout\Breakout.csproj" />
     <EmbeddedResource Include="..\BreakoutTests\Assets\**\*.png"/>
     <EmbeddedResource Include="..\BreakoutTests\Assets\**\*.txt"/>
-    <ProjectReference Include="..\DIKUArcade\DIKUArcade.csproj" />
+    <ProjectReference Include="..\DIKUArcade\DIKUArcade\DIKUArcade.csproj" />
   </ItemGroup>
 
 

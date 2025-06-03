@@ -13,9 +13,9 @@ public class Ball : Entity {
     private float speed;
     private float speedMultiplier = 1.0f;
 
-    public Ball(DynamicShape shape, IBaseImage image, float initalSpeed)
+    public Ball(DynamicShape shape, IBaseImage image, float initialSpeed)
         : base(shape, image) {
-        speed = initalSpeed;
+        speed = initialSpeed;
         Velocity = new Vector2(0.0f, speed);
     }
 

@@ -254,7 +254,9 @@ public class GameRunning : IGameState {
         _player.SetSpeedMultiplier(multiplier);
     }
     public void DoubleSpeed(float multiplier = 2.0f) {
-        _ball.SetSpeedMultiplier(multiplier);
+        foreach (var ball in activeBalls) {
+            ball.SetSpeedMultiplier(multiplier);
+        }
     }
 
     public Ball CreateBall() {
@@ -268,8 +270,8 @@ public class GameRunning : IGameState {
     public void SplitBalls() {
         var newBalls = new List<Ball>();
         foreach (var ball in activeBalls) {
-            var pos = _ball.Shape.Position;
-            var velocity = _ball.Velocity;
+            var pos = ball.Shape.Position;
+            var velocity = ball.Velocity;
             var angles = new float[] { 0, 30f, -30f };
             foreach (var angleDeg in angles) {
                 var rad = MathF.PI * angleDeg / 180f;
@@ -278,7 +280,7 @@ public class GameRunning : IGameState {
                 var newVelX = velocity.X * cos - velocity.Y * sin;
                 var newVelY = velocity.X * sin + velocity.Y * cos;
                 var newVelocity = new Vector2(newVelX, newVelY);
-                var newBall = new Ball(new DynamicShape(pos, _ball.Shape.Extent), _ball.Image, 0.02f);
+                var newBall = new Ball(new DynamicShape(pos, ball.Shape.Extent), _ball.Image, 0.02f);
                 newBall.SetDirection(Vector2.Normalize(newVelocity));
                 newBalls.Add(newBall);
             }
