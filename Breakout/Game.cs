@@ -1,5 +1,4 @@
 namespace Breakout;
-using Breakout.Points;
 using Breakout.States;
 using DIKUArcade;
 using DIKUArcade.Graphics;
@@ -9,13 +8,11 @@ using DIKUArcade.Input;
 
 public class Game : DIKUGame {
     private readonly StateMachine stateMachine;
-    private Points.PointTracker points;
 
 
     public Game(WindowArgs windowArgs) : base(windowArgs) {
         // Initialize state machine (starts in MainMenu)
         stateMachine = new StateMachine();
-        points = new Points.PointTracker();
 
     }
 
