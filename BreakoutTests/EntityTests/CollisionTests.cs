@@ -1,16 +1,16 @@
 namespace BreakoutTests.EntityTests;
 
+using System.Collections.Generic;
 using System.Numerics;
 using Breakout;
 using Breakout.Balls;
 using Breakout.Blocks;
+using Breakout.Managers;
+using Breakout.Points;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.Physics;
 using NUnit.Framework;
-using Breakout.Managers;
-using Breakout.Points;
-using System.Collections.Generic;
 
 public class CollisionTests {
     public Ball testBall;
@@ -41,12 +41,6 @@ public class CollisionTests {
 
     [Test]
     public void DestroyingBlockAwardsPoints() {
-        var ball = new Ball(
-            new DynamicShape(new Vector2(0.5f, 0.5f), new Vector2(0.05f, 0.05f)),
-            new NoImage(),
-            0.02f);
-        ball.Shape.AsDynamicShape().ChangeVelocity(ball.Velocity);
-
         var block = new StandardBlock(
             new StationaryShape(new Vector2(0.5f, 0.5f), new Vector2(0.05f, 0.05f)),
             new NoImage());
@@ -57,11 +51,10 @@ public class CollisionTests {
 
         var tracker = new PointTracker();
 
-        var balls = new List<Ball> { ball };
-        var blocks = new List<IBlock> { block };
-        var manager = new CollisionManager(balls, blocks, player, tracker);
+        var manager = new CollisionManager(new List<Ball>(), new List<IBlock> { block }, player, tracker);
 
-        manager.Update();
+
+        block.DecreaseHealth(); // Simulate a hit
 
         Assert.AreEqual(block.GetValue(), tracker.GetScore());
     }

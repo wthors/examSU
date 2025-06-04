@@ -1,10 +1,10 @@
 namespace Breakout.Level;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using Breakout.Blocks;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
-using System.IO;
 
 /// <summary>
 /// The AdvancedLevelBuilder class implements the ILevelBuilder interface.
@@ -52,41 +52,41 @@ public class LevelBuilder : ILevelBuilder {
         }
 
         for (int i = 0; i < _mapRows.Count; i++) {
-                var line = _mapRows[i];
-                for (int j = 0; j < line.Length; j++) {
-                    char sym = line[j];
-                    if (sym == '-' || !_legend.ContainsKey(sym))
-                        continue;
+            var line = _mapRows[i];
+            for (int j = 0; j < line.Length; j++) {
+                char sym = line[j];
+                if (sym == '-' || !_legend.ContainsKey(sym))
+                    continue;
 
-                    float x = j * _blockWidth;
-                    float y = 1.0f - (i + 1) * _blockHeight;
-                    var shape = new StationaryShape(
-                        new Vector2(x, y),
-                        new Vector2(_blockWidth, _blockHeight)
-                    );
+                float x = j * _blockWidth;
+                float y = 1.0f - (i + 1) * _blockHeight;
+                var shape = new StationaryShape(
+                    new Vector2(x, y),
+                    new Vector2(_blockWidth, _blockHeight)
+                );
 
-                    string baseName = _legend[sym];
-                    var healthyImage = new Image($"Breakout.Assets.Images.{baseName}");
-                    string damagedName = Path.GetFileNameWithoutExtension(baseName) + "-damaged";
-                    var damagedImage = new Image($"Breakout.Assets.Images.{damagedName}.png");
-                    var powerUpIcon = new Image($"Breakout.Assets.Images.DoubleSpeedPowerUp.png");
+                string baseName = _legend[sym];
+                var healthyImage = new Image($"Breakout.Assets.Images.{baseName}");
+                string damagedName = Path.GetFileNameWithoutExtension(baseName) + "-damaged";
+                var damagedImage = new Image($"Breakout.Assets.Images.{damagedName}.png");
+                var powerUpIcon = new Image($"Breakout.Assets.Images.DoubleSpeedPowerUp.png");
 
-                    bool isUnbreakable = unbreakableSymbols.Contains(sym);
-                    bool isHardened = hardenedSymbols.Contains(sym);
-                    bool isPowerUp = powerUpSymbols.Contains(sym);
+                bool isUnbreakable = unbreakableSymbols.Contains(sym);
+                bool isHardened = hardenedSymbols.Contains(sym);
+                bool isPowerUp = powerUpSymbols.Contains(sym);
 
-                    // choose type in order: Unbreakable → Hardened → PowerUp → Standard
-                    string type = isUnbreakable
-                                  ? "Unbreakable"
-                                  : isHardened
-                                    ? "Hardened"
-                                    : isPowerUp
-                                        ? "PowerUp"
-                                        : "Standard";
+                // choose type in order: Unbreakable → Hardened → PowerUp → Standard
+                string type = isUnbreakable
+                              ? "Unbreakable"
+                              : isHardened
+                                ? "Hardened"
+                                : isPowerUp
+                                    ? "PowerUp"
+                                    : "Standard";
 
-                    blocks.Add(BlockFactory.Create(type, shape, healthyImage, damagedImage, powerUpIcon));
-                }
+                blocks.Add(BlockFactory.Create(type, shape, healthyImage, damagedImage, powerUpIcon));
             }
+        }
         return blocks;
     }
 }

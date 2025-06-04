@@ -18,6 +18,10 @@ public class CollisionManager {
         _blocks = blocks;
         _player = player;
         _pointTracker = pointTracker;
+
+        foreach (var block in _blocks) {
+            block.OnBlockDestroyed += b => _pointTracker.AddPoints(b.GetValue());
+        }
     }
 
     public void Update() {
@@ -57,11 +61,8 @@ public class CollisionManager {
                     } else {
                         ball.ReflectVertical();
                     }
-                    // Apply damage to the block and award points if destroyed
+                    // Apply damage to the block
                     block.DecreaseHealth();
-                    if (!block.IsAlive) {
-                        _pointTracker.AddPoints(block.GetValue());
-                    }
                     // Only handle the first collision per ball per frame
                     break;
                 }
