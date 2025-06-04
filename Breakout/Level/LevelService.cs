@@ -14,18 +14,27 @@ public interface ILevelService {
 /// </summary>
 public class LevelService : ILevelService {
     private readonly LevelDirector _director;
+    private readonly Dictionary<int, LevelDefinition> _levelCache = new();
     public LevelService(LevelDirector director) {
         _director = director;
     }
+    private LevelDefinition GetDefinition(int levelNumber) {
+        if (!_levelCache.TryGetValue(levelNumber, out var def)) {
+            string resName = $"Breakout.Assets.Levels.level{levelNumber}.txt";
+            def = LevelLoader.LoadLevel(resName);
+            _levelCache[levelNumber] = def;
+        }
+        return def;
+    }
+
+
     public List<IBlock> GetBlocks(int levelNumber) {
-        string resName = $"Breakout.Assets.Levels.level{levelNumber}.txt";
-        var def = LevelLoader.LoadLevel(resName);
+        var def = GetDefinition(levelNumber);
         return _director.Construct(def);
     }
 
     public Dictionary<string, string> GetMetadata(int levelNumber) {
-        string resName = $"Breakout.Assets.Levels.level{levelNumber}.txt";
-        var def = LevelLoader.LoadLevel(resName);
+        var def = GetDefinition(levelNumber);
         return def.Metadata;
     }
 
