@@ -53,7 +53,6 @@ public class CollisionTests {
 
         var manager = new CollisionManager(new List<Ball>(), new List<IBlock> { block }, player, tracker);
 
-
         block.DecreaseHealth(); // Simulate a hit
 
         Assert.AreEqual(block.GetValue(), tracker.GetScore());

@@ -179,5 +179,26 @@ public class PowerUpTests {
         Assert.AreEqual(expectedCount, newBallCount,
             "SplitBalls should increase the number of active balls (e.g., 1 ball becomes 3 balls).");
     }
+
+    [Test]
+    public void DoubleSpeed_ExpiresAndResetsBallSpeed() {
+        var state = new GameRunning(null, levelNumber: 1);
+        state.DoubleSpeed(multiplier: 2.0f, duration: 1);
+
+        var ballManager = (BallManager) ballManagerField.GetValue(state);
+        var ball = ballManager.Balls[0];
+
+        Assert.AreEqual(2.0f, (float) ballSpeedMultField.GetValue(ball));
+
+        var listField = typeof(GameRunning).GetField("_activePowerUps", BindingFlags.NonPublic | BindingFlags.Instance);
+        var list = (System.Collections.IList) listField.GetValue(state);
+        var tuple = (ValueTuple<PowerUpType, GameTimer>) list[0];
+        tuple.Item2.AddTime(-1); // expire immediately
+
+        state.Update();
+
+        Assert.AreEqual(1.0f, (float) ballSpeedMultField.GetValue(ball),
+            "Ball speed should reset when DoubleSpeed duration expires.");
+    }
 }
 

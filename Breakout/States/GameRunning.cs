@@ -9,6 +9,7 @@ using Breakout.Blocks;
 using Breakout.Level;
 using Breakout.Managers;
 using Breakout.Points;
+using Breakout.PowerUps;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
@@ -38,6 +39,8 @@ public class GameRunning : IGameState {
     private readonly HazardManager _hazardManager;
     private readonly PowerUpManager _powerUpManager;
     private readonly BallManager _ballManager;
+
+    private readonly List<(PowerUpType type, GameTimer timer)> _activePowerUps = new();
 
     private readonly PointTracker pointTracker;
     private readonly List<IBlock> _blocks;
@@ -94,36 +97,12 @@ public class GameRunning : IGameState {
 
 
     public void Render(WindowContext context) {
-        // Render player paddle and balls
-        _player.RenderEntity(context);
-        foreach (var ball in _ballManager.Balls) {
-            ball.RenderEntity(context);
-        }
-        // Render remaining blocks
-        foreach (var block in _blocks) {
-            if (block.IsAlive) {
-                block.Render(context);
-            }
-        }
-        // Render score and lives
-        var scoreText = new Text("Score: " + pointTracker.GetScore(), new Vector2(0.01f, 0.95f), 0.5f);
-        scoreText.SetColor(225, 225, 225);
-        scoreText.Render(context);
-        var livesText = new Text("Lives: ", new Vector2(0.4f, 0.95f), 0.5f);
-        livesText.SetColor(225, 225, 225);
-        livesText.Render(context);
-        var livesValue = new Text(_lives.ToString(), new Vector2(0.58f, 0.95f), 0.5f);
-        livesValue.SetColor(0, 225, 0);
-        livesValue.Render(context);
-        // Render timer if applicable
-        if (_timer != null) {
-            var timeText = new Text("Time: " + _timer.Remaining, new Vector2(0.69f, 0.95f), 0.5f);
-            timeText.SetColor(225, 225, 225);
-            timeText.Render(context);
-        }
-        // Render hazards and power-ups
-        _hazardManager.Render(context);
-        _powerUpManager.Render(context);
+        RenderPlayer(context);
+        RenderBalls(context);
+        RenderBlocks(context);
+        RenderUI(context);
+        RenderHazards(context);
+        RenderPowerUps(context);
     }
 
     public void Update() {
@@ -134,6 +113,7 @@ public class GameRunning : IGameState {
         if (_lives == 0)
             return;
         HandlePowerUps();
+        UpdateActivePowerUps();
         UpdateTimer();
         if (_lives == 0)
             return;
@@ -189,6 +169,26 @@ public class GameRunning : IGameState {
         _powerUpManager.Update(this);
     }
 
+    private void UpdateActivePowerUps() {
+        for (int i = _activePowerUps.Count - 1; i >= 0; i--) {
+            var (type, timer) = _activePowerUps[i];
+            timer.Update();
+            if (timer.Remaining <= 0) {
+                switch (type) {
+                    case PowerUpType.DoubleSpeed:
+                        foreach (var ball in _ballManager.Balls) {
+                            ball.ResetSpeed();
+                        }
+                        break;
+                    case PowerUpType.PlayerSpeed:
+                        _player.ResetSpeed();
+                        break;
+                }
+                _activePowerUps.RemoveAt(i);
+            }
+        }
+    }
+
     private void UpdateTimer() {
         // Countdown timer if active
         if (_timer != null) {
@@ -230,6 +230,59 @@ public class GameRunning : IGameState {
         }
     }
 
+    private void RenderPlayer(WindowContext context) {
+        _player.RenderEntity(context);
+    }
+    private void RenderBalls(WindowContext context) {
+        foreach (var ball in _ballManager.Balls) {
+            ball.RenderEntity(context);
+        }
+    }
+    private void RenderBlocks(WindowContext context) {
+        foreach (var block in _blocks) {
+            if (block.IsAlive) {
+                block.Render(context);
+            }
+        }
+    }
+
+    private void RenderScore(WindowContext context) {
+        var scoreText = new Text("Score: " + pointTracker.GetScore(), new Vector2(0.01f, 0.95f), 0.5f);
+        scoreText.SetColor(225, 225, 225);
+        scoreText.Render(context);
+    }
+
+    private void RenderLives(WindowContext context) {
+        var livesText = new Text("Lives: ", new Vector2(0.4f, 0.95f), 0.5f);
+        livesText.SetColor(225, 225, 225);
+        livesText.Render(context);
+        var livesValue = new Text(_lives.ToString(), new Vector2(0.58f, 0.95f), 0.5f);
+        livesValue.SetColor(0, 225, 0);
+        livesValue.Render(context);
+    }
+
+    private void RenderTimer(WindowContext context) {
+        if (_timer != null) {
+            var timeText = new Text("Time: " + _timer.Remaining, new Vector2(0.69f, 0.95f), 0.5f);
+            timeText.SetColor(225, 225, 225);
+            timeText.Render(context);
+        }
+    }
+
+    private void RenderUI(WindowContext context) {
+        RenderScore(context);
+        RenderLives(context);
+        RenderTimer(context);
+    }
+
+    private void RenderHazards(WindowContext context) {
+        _hazardManager.Render(context);
+    }
+
+    private void RenderPowerUps(WindowContext context) {
+        _powerUpManager.Render(context);
+    }
+
     public void ResetTimer() {
         _timer?.Reset();
     }
@@ -250,13 +303,15 @@ public class GameRunning : IGameState {
     public void AddTime(int seconds) {
         _timer?.AddTime(seconds);
     }
-    public void IncreasePaddleSpeed(float multiplier = 1.5f) {
+    public void IncreasePaddleSpeed(float multiplier = 1.5f, int duration = 10) {
         _player.SetSpeedMultiplier(multiplier);
+        _activePowerUps.Add((PowerUpType.PlayerSpeed, new GameTimer(duration)));
     }
-    public void DoubleSpeed(float multiplier = 2.0f) {
+    public void DoubleSpeed(float multiplier = 2.0f, int duration = 10) {
         foreach (var ball in _ballManager.Balls) {
             ball.SetSpeedMultiplier(multiplier);
         }
+        _activePowerUps.Add((PowerUpType.DoubleSpeed, new GameTimer(duration)));
     }
 
     public Ball CreateBall() {
