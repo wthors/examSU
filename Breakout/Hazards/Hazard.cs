@@ -66,7 +66,7 @@ public class Hazard : Entity {
         }
     }
 
-    public void Activate(GameRunning state) {
+    public void Activate(IGameEffectTarget state) {
         switch (Type) {
             case HazardType.LoseLife:
                 state.LoseLife();

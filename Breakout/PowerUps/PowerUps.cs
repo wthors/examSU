@@ -45,7 +45,7 @@ public class PowerUp : Entity {
         Shape.AsDynamicShape().Velocity = fallingSpeed;
         Shape.Position += fallingSpeed;
     }
-    public void Activate(GameRunning state) {
+    public void Activate(IGameEffectTarget state) {
         switch (type) {
             case PowerUpType.GainLife:
                 state.GainLife();
