@@ -17,6 +17,15 @@ public class LevelBuilder : ILevelBuilder {
     private Dictionary<string, string> _metadata;
     private float _blockWidth;
     private float _blockHeight;
+    private readonly Dictionary<string, Image> _imageCache = new();
+
+    private Image GetImage(string resourceName) {
+        if (!_imageCache.TryGetValue(resourceName, out var img)) {
+            img = new Image(resourceName);
+            _imageCache[resourceName] = img;
+        }
+        return img;
+    }
 
     public ILevelBuilder WithMapRows(List<string> mapRows) {
         _mapRows = mapRows;
@@ -66,10 +75,10 @@ public class LevelBuilder : ILevelBuilder {
                 );
 
                 string baseName = _legend[sym];
-                var healthyImage = new Image($"Breakout.Assets.Images.{baseName}");
+                var healthyImage = GetImage($"Breakout.Assets.Images.{baseName}");
                 string damagedName = Path.GetFileNameWithoutExtension(baseName) + "-damaged";
-                var damagedImage = new Image($"Breakout.Assets.Images.{damagedName}.png");
-                var powerUpIcon = new Image($"Breakout.Assets.Images.DoubleSpeedPowerUp.png");
+                var damagedImage = GetImage($"Breakout.Assets.Images.{damagedName}.png");
+                var powerUpIcon = GetImage($"Breakout.Assets.Images.DoubleSpeedPowerUp.png");
 
                 bool isUnbreakable = unbreakableSymbols.Contains(sym);
                 bool isHardened = hardenedSymbols.Contains(sym);
