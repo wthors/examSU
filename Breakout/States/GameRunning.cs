@@ -13,7 +13,6 @@ using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Input;
-using DIKUArcade.Timers;
 
 public class GameRunning : IGameState {
     private const double HazardChance = 0.2; // 20% chance to spawn a hazard
@@ -45,9 +44,7 @@ public class GameRunning : IGameState {
     private CollisionManager _collisionManager;
 
     public int _lives;
-    private readonly bool _hasTimer;
-    private int _timeRemaining;
-    private long _lastTickTime;
+    private readonly GameTimer? _timer;
 
     private static readonly Random random = new Random();
 
@@ -69,14 +66,12 @@ public class GameRunning : IGameState {
         _blocks = _levelService.GetBlocks(_levelNumber);
 
         // Setup timer if level has a time limit
+        GameTimer? timer = null;
         var metadata = _levelService.GetMetadata(_levelNumber);
         if (metadata.TryGetValue("Time", out var t) && int.TryParse(t, out var seconds)) {
-            _hasTimer = true;
-            _timeRemaining = seconds;
-            _lastTickTime = StaticTimer.GetElapsedMilliseconds();
-        } else {
-            _hasTimer = false;
+            timer = new GameTimer(seconds);
         }
+        _timer = timer;
 
         // Prepare ball image and speed, then create initial ball manager
         _ballImage = new Image("Breakout.Assets.Images.ball.png");
@@ -121,8 +116,8 @@ public class GameRunning : IGameState {
         livesValue.SetColor(0, 225, 0);
         livesValue.Render(context);
         // Render timer if applicable
-        if (_hasTimer) {
-            var timeText = new Text("Time: " + _timeRemaining, new Vector2(0.69f, 0.95f), 0.5f);
+        if (_timer != null) {
+            var timeText = new Text("Time: " + _timer.Remaining, new Vector2(0.69f, 0.95f), 0.5f);
             timeText.SetColor(225, 225, 225);
             timeText.Render(context);
         }
@@ -142,7 +137,6 @@ public class GameRunning : IGameState {
         UpdateTimer();
         if (_lives == 0)
             return;
-        RemoveOffscreenBalls();
         HandleBallLoss();
         if (_lives == 0)
             return;
@@ -162,7 +156,7 @@ public class GameRunning : IGameState {
             }
         } else if (action == KeyboardAction.KeyPress && key == KeyboardKey.Space && !_ballManager.BallLaunched) {
             float rx = (float) (random.NextDouble() * 1.0 - 0.5);
-            _ballManager.LaunchBall(new Vector2(rx, -1.0f));
+            _ballManager.LaunchBall(new Vector2(rx, 1.0f));
         } else {
             _player.KeyHandler(action, key);
         }
@@ -197,14 +191,10 @@ public class GameRunning : IGameState {
 
     private void UpdateTimer() {
         // Countdown timer if active
-        if (_hasTimer) {
-            long elapsed = StaticTimer.GetElapsedMilliseconds();
-            if (_lastTickTime + 1000 < elapsed) {
-                _timeRemaining = Math.Max(0, _timeRemaining - 1);
-                _lastTickTime += 1000;
-                if (_timeRemaining == 0) {
-                    _stateMachine.ActiveState = new GameLost(_stateMachine, _levelNumber, pointTracker.GetScore());
-                }
+        if (_timer != null) {
+            _timer.Update();
+            if (_timer.Remaining <= 0) {
+                _stateMachine.ActiveState = new GameLost(_stateMachine, _levelNumber, pointTracker.GetScore());
             }
         }
     }
@@ -214,36 +204,34 @@ public class GameRunning : IGameState {
     }
 
     private void HandleBallLoss() {
-        _ballManager.RemoveOffscreenBalls();
+        RemoveOffscreenBalls();
         if (_ballManager.Balls.Count == 0) {
-            _ballManager.ResetLaunch();
-            _ballManager.CreateBall();
-            } else {
-            // No lives left -> game over
-            _stateMachine.ActiveState = new GameLost(_stateMachine, _levelNumber, pointTracker.GetScore());
+            LoseLife();
+            if (_lives > 0) {
+                _ballManager.ResetLaunch();
+                _ballManager.CreateBall();
+            }
         }
     }
-    
+
     private void CheckWinCondition() {
         // Check win condition (all breakable blocks destroyed)
         bool allBlocksDestroyed = _blocks
                 .Where(b => !(b is UnbreakableBlock))
                 .All(b => !b.IsAlive);
-            if (allBlocksDestroyed) {
-                int nextLevel = _levelNumber + 1;
-                try {
-                    _stateMachine.ActiveState = new GameRunning(_stateMachine, nextLevel, pointTracker);
-                } catch (FileNotFoundException) {
-                    // All levels completed -> main menu
-                    _stateMachine.ActiveState = new GameWon(_stateMachine, _levelNumber, pointTracker.GetScore());
-                }
+        if (allBlocksDestroyed) {
+            int nextLevel = _levelNumber + 1;
+            try {
+                _stateMachine.ActiveState = new GameRunning(_stateMachine, nextLevel, pointTracker);
+            } catch (FileNotFoundException) {
+                // All levels completed -> main menu
+                _stateMachine.ActiveState = new GameWon(_stateMachine, _levelNumber, pointTracker.GetScore());
             }
+        }
     }
 
     public void ResetTimer() {
-        if (_hasTimer) {
-            _lastTickTime = StaticTimer.GetElapsedMilliseconds();
-        }
+        _timer?.Reset();
     }
 
     public void GainLife() {
@@ -260,7 +248,7 @@ public class GameRunning : IGameState {
     }
 
     public void AddTime(int seconds) {
-        _timeRemaining = Math.Max(0, _timeRemaining + seconds);
+        _timer?.AddTime(seconds);
     }
     public void IncreasePaddleSpeed(float multiplier = 1.5f) {
         _player.SetSpeedMultiplier(multiplier);

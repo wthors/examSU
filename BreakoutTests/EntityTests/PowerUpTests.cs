@@ -17,7 +17,7 @@ using NUnit.Framework;
 
 [TestFixture]
 public class PowerUpTests {
-    private FieldInfo timeField;
+    private FieldInfo timerField;
     private FieldInfo playerField;
     private FieldInfo playerSpeedMultField;
     private FieldInfo ballManagerField;
@@ -27,7 +27,7 @@ public class PowerUpTests {
 
     [SetUp]
     public void SetUp() {
-        timeField = typeof(GameRunning).GetField("_timeRemaining", BindingFlags.NonPublic | BindingFlags.Instance);
+        timerField = typeof(GameRunning).GetField("_timer", BindingFlags.NonPublic | BindingFlags.Instance);
         playerField = typeof(GameRunning).GetField("_player", BindingFlags.NonPublic | BindingFlags.Instance);
         playerSpeedMultField = typeof(Player).GetField("speedMultiplier", BindingFlags.NonPublic | BindingFlags.Instance);
         ballManagerField = typeof(GameRunning).GetField("_ballManager", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -94,13 +94,15 @@ public class PowerUpTests {
             PowerUpType.MoreTime
         );
         // Capture the initial remaining time (could be 0 if no timer, or level metadata value)
-        int initialTime = (int) timeField.GetValue(state);
+        var timer = (GameTimer) timerField.GetValue(state);
+        int initialTime = timer?.Remaining ?? 0;
 
         // Act: activate MoreTime power-up
         moreTimePU.Activate(state);
 
         // Assert: time remaining should be initial + 10 seconds
-        int updatedTime = (int) timeField.GetValue(state);
+        timer = (GameTimer) timerField.GetValue(state);
+        int updatedTime = timer?.Remaining ?? 0;
         Assert.AreEqual(initialTime + 10, updatedTime,
             "MoreTime should add 10 seconds to the remaining time.");
     }
@@ -140,7 +142,7 @@ public class PowerUpTests {
         // Get ball's current speed multiplier (should start at 1.0)
         var BallManager = (BallManager) ballManagerField.GetValue(state);
         var ball = BallManager.Balls[0]; // Get the first ball
-    
+
         float initialBallMult = (float) ballSpeedMultField.GetValue(ball);
         Assert.AreEqual(1.0f, initialBallMult, "Initial ball speed multiplier should be 1.0.");
 

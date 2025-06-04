@@ -33,7 +33,8 @@ public class BallManager {
     }
 
     public void LaunchBall(Vector2 direction) {
-        if (_ballLaunched) return;
+        if (_ballLaunched)
+            return;
         foreach (var ball in _balls) {
             ball.BallLaunch(direction);
         }
@@ -41,7 +42,8 @@ public class BallManager {
     }
 
     public void MoveBalls() {
-        if (!_ballLaunched) return;
+        if (!_ballLaunched)
+            return;
         for (int i = _balls.Count - 1; i >= 0; i--) {
             _balls[i].Move();
         }
