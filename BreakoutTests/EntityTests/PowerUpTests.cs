@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Reflection;
 using Breakout;
 using Breakout.Balls;
+using Breakout.Managers;
 using Breakout.PowerUps;
 using Breakout.States;
 using DIKUArcade.Entities;
@@ -19,7 +20,7 @@ public class PowerUpTests {
     private FieldInfo timeField;
     private FieldInfo playerField;
     private FieldInfo playerSpeedMultField;
-    private FieldInfo ballField;
+    private FieldInfo ballManagerField;
     private FieldInfo ballSpeedMultField;
     private FieldInfo activeBallsField;
 
@@ -29,9 +30,8 @@ public class PowerUpTests {
         timeField = typeof(GameRunning).GetField("_timeRemaining", BindingFlags.NonPublic | BindingFlags.Instance);
         playerField = typeof(GameRunning).GetField("_player", BindingFlags.NonPublic | BindingFlags.Instance);
         playerSpeedMultField = typeof(Player).GetField("speedMultiplier", BindingFlags.NonPublic | BindingFlags.Instance);
-        ballField = typeof(GameRunning).GetField("_ball", BindingFlags.NonPublic | BindingFlags.Instance);
+        ballManagerField = typeof(GameRunning).GetField("_ballManager", BindingFlags.NonPublic | BindingFlags.Instance);
         ballSpeedMultField = typeof(Ball).GetField("speedMultiplier", BindingFlags.NonPublic | BindingFlags.Instance);
-        activeBallsField = typeof(GameRunning).GetField("activeBalls", BindingFlags.NonPublic | BindingFlags.Instance);
     }
 
     [Test]
@@ -138,7 +138,9 @@ public class PowerUpTests {
             PowerUpType.DoubleSpeed
         );
         // Get ball's current speed multiplier (should start at 1.0)
-        var ball = (Ball) ballField.GetValue(state);
+        var BallManager = (BallManager) ballManagerField.GetValue(state);
+        var ball = BallManager.Balls[0]; // Get the first ball
+    
         float initialBallMult = (float) ballSpeedMultField.GetValue(ball);
         Assert.AreEqual(1.0f, initialBallMult, "Initial ball speed multiplier should be 1.0.");
 
@@ -161,7 +163,8 @@ public class PowerUpTests {
             PowerUpType.SplitBalls
         );
         // Check initial number of active balls (should start with 1 ball in play)
-        var ballsList = (System.Collections.IList) activeBallsField.GetValue(state);
+        var ballManager = (BallManager) ballManagerField.GetValue(state);
+        var ballsList = ballManager.Balls;
         int initialBallCount = ballsList.Count;
         Assert.GreaterOrEqual(initialBallCount, 1, "There should be at least one ball active initially.");
 

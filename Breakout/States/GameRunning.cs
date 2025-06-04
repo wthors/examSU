@@ -78,11 +78,12 @@ public class GameRunning : IGameState {
             _hasTimer = false;
         }
 
-        // Prepare ball image and speed, then create initial ball
+        // Prepare ball image and speed, then create initial ball manager
         _ballImage = new Image("Breakout.Assets.Images.ball.png");
         _ballSpeed = 0.02f;
-        _ball = CreateBall();
-        activeBalls.Add(_ball);
+        _ballManager = new BallManager(_ballImage, _ballSpeed);
+        _ballManager.CreateBall();
+
 
         // Initialize player paddle
         _player = new Player(
@@ -93,14 +94,14 @@ public class GameRunning : IGameState {
         //initialize managers
         _hazardManager = new HazardManager(_blocks, HazardChance);
         _powerUpManager = new PowerUpManager(_blocks);
-        _collisionManager = new CollisionManager(activeBalls, _blocks, _player, pointTracker);
+        _collisionManager = new CollisionManager(_ballManager.Balls, _blocks, _player, pointTracker);
     }
 
 
     public void Render(WindowContext context) {
         // Render player paddle and balls
         _player.RenderEntity(context);
-        foreach (var ball in activeBalls) {
+        foreach (var ball in _ballManager.Balls) {
             ball.RenderEntity(context);
         }
         // Render remaining blocks
@@ -207,14 +208,9 @@ public class GameRunning : IGameState {
             }
         }
     }
-
     private void RemoveOffscreenBalls() {
-        // Remove balls that fell below the screen
-        for (int i = activeBalls.Count - 1; i >= 0; i--) {
-            if (activeBalls[i].Shape.Position.Y <= 0.0f) {
-                activeBalls.RemoveAt(i);
-            }
-        }
+        // Remove balls that have fallen off the bottom of the screen
+        _ballManager.RemoveOffscreenBalls();
     }
 
     private void HandleBallLoss() {
@@ -270,7 +266,7 @@ public class GameRunning : IGameState {
         _player.SetSpeedMultiplier(multiplier);
     }
     public void DoubleSpeed(float multiplier = 2.0f) {
-        foreach (var ball in activeBalls) {
+        foreach (var ball in _ballManager.Balls) {
             ball.SetSpeedMultiplier(multiplier);
         }
     }
@@ -284,24 +280,6 @@ public class GameRunning : IGameState {
     }
 
     public void SplitBalls() {
-        var newBalls = new List<Ball>();
-        foreach (var ball in activeBalls) {
-            var pos = ball.Shape.Position;
-            var velocity = ball.Velocity;
-            var angles = new float[] { 0, 30f, -30f };
-            foreach (var angleDeg in angles) {
-                var rad = MathF.PI * angleDeg / 180f;
-                var cos = MathF.Cos(rad);
-                var sin = MathF.Sin(rad);
-                var newVelX = velocity.X * cos - velocity.Y * sin;
-                var newVelY = velocity.X * sin + velocity.Y * cos;
-                var newVelocity = new Vector2(newVelX, newVelY);
-                var newBall = new Ball(new DynamicShape(pos, ball.Shape.Extent), _ball.Image, 0.02f);
-                newBall.SetDirection(Vector2.Normalize(newVelocity));
-                newBalls.Add(newBall);
-            }
-        }
-        activeBalls.Clear();
-        activeBalls.AddRange(newBalls);
+        _ballManager.SplitBalls();
     }
 }
