@@ -7,6 +7,10 @@ using Breakout.Points;
 using Breakout.States;
 using DIKUArcade.Physics;
 
+/// <summary>
+/// Detects and resolves collisions between balls, blocks and the player paddle.
+/// </summary>
+
 public class CollisionManager {
     private readonly List<Ball> _balls;
     private readonly List<IBlock> _blocks;

@@ -1,4 +1,8 @@
 namespace Breakout.Points;
+
+/// <summary>
+/// Tracks the player's score across levels.
+/// </summary>
 public class PointTracker {
     private int score;
 

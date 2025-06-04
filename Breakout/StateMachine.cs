@@ -1,5 +1,9 @@
 namespace Breakout.States;
 
+/// <summary>
+/// Keeps track of the current and previous game states.
+/// </summary>
+
 public class StateMachine {
     public IGameState PreviousState {
         get; private set;

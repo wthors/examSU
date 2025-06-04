@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using Breakout.Blocks;
 using Breakout.Level;
 
+/// <summary>
+/// Provides level data and metadata to the game.
+/// </summary>
+
 public interface ILevelService {
     List<IBlock> GetBlocks(int levelNumber);
     Dictionary<string, string> GetMetadata(int levelNumber);

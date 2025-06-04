@@ -5,6 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+/// <summary>
+/// Container for parsed level data including map rows and metadata.
+/// </summary>
+
 public class LevelDefinition {
     public List<string> MapRows { get; set; } = new List<string>();
     public Dictionary<string, string> Metadata { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);

@@ -6,6 +6,10 @@ using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Input;
 
+/// <summary>
+/// State shown when the player loses all lives or time runs out.
+/// </summary>
+
 public class GameLost : IGameState {
     private readonly StateMachine _stateMachine;
     private readonly int _levelNumber;

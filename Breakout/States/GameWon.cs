@@ -7,6 +7,10 @@ using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Input;
 
+/// <summary>
+/// Displayed after the player completes the final level.
+/// </summary>
+
 public class GameWon : IGameState {
     private readonly StateMachine _stateMachine;
     private readonly int _levelNumber;

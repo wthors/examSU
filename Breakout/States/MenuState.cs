@@ -5,6 +5,10 @@ using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Input;
 
+/// <summary>
+/// Base class for menu-style states with selectable text options.
+/// </summary>
+
 public abstract class MenuState : IGameState {
     protected Text[] texts = null!;
     protected int active = 0;

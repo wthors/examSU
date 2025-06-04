@@ -12,6 +12,10 @@ public enum PowerUpType {
     SplitBalls
 }
 
+/// <summary>
+/// Collectible item that grants an effect when picked up.
+/// </summary>
+
 public class PowerUp : Entity {
     private static readonly PowerUpType[] AllPowerUpTypes = (PowerUpType[]) Enum.GetValues(typeof(PowerUpType));
     private static readonly Random random = new Random();

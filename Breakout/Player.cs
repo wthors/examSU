@@ -7,6 +7,9 @@ using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Input;
 
+/// <summary>
+/// Represents the player-controlled paddle.
+/// </summary>
 
 public class Player : Entity {
 

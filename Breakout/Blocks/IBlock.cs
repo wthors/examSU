@@ -3,6 +3,10 @@ using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 
+/// <summary>
+/// Exposes common behaviour and properties for all block types.
+/// </summary>
+
 public interface IBlock {
     int Health {
         get;

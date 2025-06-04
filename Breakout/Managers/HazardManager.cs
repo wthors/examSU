@@ -9,6 +9,9 @@ using DIKUArcade.Entities;
 using DIKUArcade.GUI;
 using DIKUArcade.Physics;
 
+/// <summary>
+/// Spawns falling hazards and handles their interaction with the player.
+/// </summary>
 
 public class HazardManager {
     private readonly List<Hazard> _activeHazards = new();

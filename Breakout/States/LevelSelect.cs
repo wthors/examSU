@@ -5,6 +5,10 @@ using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 
+/// <summary>
+/// Menu state that lets the player choose which level to play.
+/// </summary>
+
 public class LevelSelect : MenuState {
     private Text title;
     public LevelSelect(StateMachine stateMachine) : base(stateMachine) {

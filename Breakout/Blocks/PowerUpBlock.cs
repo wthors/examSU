@@ -1,7 +1,11 @@
 namespace Breakout.Blocks;
-using Breakout.PowerUps;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
+
+/// <summary>
+/// Block that spawns a power-up when destroyed.
+/// </summary>
+
 public class PowerUpBlock : BlockBase {
     public IBaseImage PowerUpIcon {
         get;

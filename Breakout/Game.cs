@@ -5,6 +5,9 @@ using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Input;
 
+/// <summary>
+/// Main game loop that delegates logic and rendering to the active game state.
+/// </summary>
 
 public class Game : DIKUGame {
     private readonly StateMachine stateMachine;

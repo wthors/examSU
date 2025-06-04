@@ -1,5 +1,9 @@
 namespace Breakout.States;
 
+/// <summary>
+/// Interface for applying game effects produced by hazards or power-ups.
+/// </summary>
+
 public interface IGameEffectTarget {
     void GainLife();
     void LoseLife();

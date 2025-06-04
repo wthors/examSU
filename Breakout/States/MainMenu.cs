@@ -3,6 +3,10 @@ using System.Numerics;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 
+/// <summary>
+/// The initial menu state shown when the game starts.
+/// </summary>
+
 public class MainMenu : MenuState {
 
     public MainMenu(StateMachine stateMachine) : base(stateMachine) {

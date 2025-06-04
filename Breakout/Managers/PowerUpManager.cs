@@ -6,6 +6,10 @@ using Breakout.States;
 using DIKUArcade.GUI;
 using DIKUArcade.Physics;
 
+/// <summary>
+/// Controls spawning and lifetime of power-ups and applies their effects.
+/// </summary>
+
 public class PowerUpManager {
     private readonly List<PowerUp> _active = new();
 
@@ -38,6 +42,7 @@ public class PowerUpManager {
             }
         }
     }
+
 
     public void Render(WindowContext ctx) {
         foreach (var pu in _active)

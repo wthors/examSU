@@ -7,6 +7,10 @@ using Breakout.Balls;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 
+/// <summary>
+/// Handles creation, launching, and updates of all balls in the game.
+/// </summary>
+
 public class BallManager {
     private readonly List<Ball> _balls = new();
     private bool _ballLaunched;

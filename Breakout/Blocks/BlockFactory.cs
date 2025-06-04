@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 
+/// <summary>
+/// Factory for creating different block types based on a string key.
+/// </summary>
+
 public static class BlockFactory {
     private static readonly Dictionary<string, Func<StationaryShape, IBaseImage, IBaseImage, IBaseImage, IBlock>>
     _registry = new Dictionary<string, Func<StationaryShape, IBaseImage, IBaseImage, IBaseImage, IBlock>>();

@@ -15,6 +15,10 @@ using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 using DIKUArcade.Input;
 
+/// <summary>
+/// Active gameplay state handling all in-game logic.
+/// </summary>
+
 public class GameRunning : IGameState, IGameEffectTarget {
     private const double HazardChance = 0.2; // 20% chance to spawn a hazard
     private const int InitialLives = 3;

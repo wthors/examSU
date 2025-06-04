@@ -3,7 +3,10 @@ using System.Numerics;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
-using DIKUArcade.Input;
+
+/// <summary>
+/// Menu displayed when the player pauses the game.
+/// </summary>
 
 public class GamePaused : MenuState {
     private Text title;

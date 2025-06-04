@@ -4,6 +4,9 @@ using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 using DIKUArcade.GUI;
 
+/// <summary>
+/// Base class for all block types in the game.
+/// </summary>
 
 public abstract class BlockBase : Entity, IBlock {
     public int Health {

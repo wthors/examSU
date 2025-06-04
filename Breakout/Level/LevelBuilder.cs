@@ -7,14 +7,15 @@ using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 
 /// <summary>
-/// The AdvancedLevelBuilder class implements the ILevelBuilder interface.
-/// It constructs a level based on the provided map rows, legend, metadata, and block size.
+/// Implements <see cref="ILevelBuilder"/> to construct levels from ASCII maps
+/// and metadata.
 /// </summary>
 
 public class LevelBuilder : ILevelBuilder {
-    private List<string> _mapRows;
-    private Dictionary<char, string> _legend;
-    private Dictionary<string, string> _metadata;
+    // initialized via builder methods
+    private List<string> _mapRows = null!;
+    private Dictionary<char, string> _legend = null!;
+    private Dictionary<string, string> _metadata = null!;
     private float _blockWidth;
     private float _blockHeight;
     private readonly Dictionary<string, Image> _imageCache = new();

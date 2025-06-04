@@ -6,10 +6,17 @@ using Breakout.States;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 
+/// <summary>
+/// Possible effects triggered by a hazard.
+/// </summary>
 
 public enum HazardType {
     LoseLife, ReduceTime
 }
+
+/// <summary>
+/// Falling object that causes a negative effect when collected.
+/// </summary>
 
 public class Hazard : Entity {
     public HazardType Type {

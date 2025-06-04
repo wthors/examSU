@@ -2,6 +2,10 @@ namespace Breakout.Level;
 using System.Collections.Generic;
 using Breakout.Blocks;
 
+/// <summary>
+/// Orchestrates the building of levels using a supplied builder.
+/// </summary>
+
 public class LevelDirector {
     private readonly ILevelBuilder _builder;
     public LevelDirector(ILevelBuilder builder) {

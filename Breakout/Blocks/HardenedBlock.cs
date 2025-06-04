@@ -2,6 +2,10 @@ namespace Breakout.Blocks;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 
+/// <summary>
+/// Block that requires two hits to be destroyed.
+/// </summary>
+
 public class HardenedBlock : BlockBase {
     private readonly IBaseImage _damaged;
 

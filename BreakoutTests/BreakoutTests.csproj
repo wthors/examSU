@@ -2,10 +2,12 @@
 
    <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    
   </PropertyGroup>
 
   <ItemGroup>

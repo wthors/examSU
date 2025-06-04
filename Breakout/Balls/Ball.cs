@@ -5,6 +5,10 @@ using System.Numerics;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
 
+/// <summary>
+/// The ball entity that bounces around the playfield.
+/// </summary>
+
 public class Ball : Entity {
     public Vector2 Velocity {
         get; set;
