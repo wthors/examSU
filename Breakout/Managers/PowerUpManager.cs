@@ -1,5 +1,4 @@
 namespace Breakout.Managers;
-using System;
 using System.Collections.Generic;
 using Breakout.Blocks;
 using Breakout.PowerUps;
@@ -9,7 +8,6 @@ using DIKUArcade.Physics;
 
 public class PowerUpManager {
     private readonly List<PowerUp> _active = new();
-    private static readonly Random _rng = new();
 
     public PowerUpManager(IEnumerable<IBlock> blocks) {
         foreach (var blk in blocks) {

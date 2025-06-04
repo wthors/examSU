@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using DIKUArcade.Entities;
 using DIKUArcade.Graphics;
-using Microsoft.VisualBasic;
 
 public static class BlockFactory {
     private static readonly Dictionary<string, Func<StationaryShape, IBaseImage, IBaseImage, IBaseImage, IBlock>>
