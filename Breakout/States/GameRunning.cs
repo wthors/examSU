@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using Breakout.Balls;
 using Breakout.Blocks;
 using Breakout.Level;
@@ -32,17 +33,15 @@ public class GameRunning : IGameState {
     public DynamicShape PlayerShape() {
         return _player.Shape.AsDynamicShape();
     }
-    private Ball _ball;
     private readonly float _ballSpeed;
     private readonly IBaseImage _ballImage;
-    private bool _ballLaunched = false;
 
     private readonly HazardManager _hazardManager;
     private readonly PowerUpManager _powerUpManager;
+    private readonly BallManager _ballManager;
 
     private readonly PointTracker pointTracker;
     private readonly List<IBlock> _blocks;
-    private List<Ball> activeBalls = new List<Ball>();
     private CollisionManager _collisionManager;
 
     public int _lives;
@@ -68,9 +67,6 @@ public class GameRunning : IGameState {
         var director = new LevelDirector(builder);
         _levelService = new LevelService(director);
         _blocks = _levelService.GetBlocks(_levelNumber);
-
-
-
 
         // Setup timer if level has a time limit
         var metadata = _levelService.GetMetadata(_levelNumber);
@@ -135,72 +131,21 @@ public class GameRunning : IGameState {
     }
 
     public void Update() {
-        // Move player paddle
-        _player.Move();
-        // Move balls if launched
-        if (_ballLaunched) {
-            for (int i = activeBalls.Count - 1; i >= 0; i--) {
-                activeBalls[i].Move();
-            }
-        }
-
-        // Check collisions for balls, player, and blocks
-        _collisionManager.Update();
-
-        // Update hazards and check for hazard-player collisions
-        _hazardManager.Update(this);
+        MovePlayer();
+        MoveBalls();
+        HandleCollisions();
+        HandleHazards();
         if (_lives == 0)
             return;
-        // Update power-up and check for power-up-player collisions
-        _powerUpManager.Update(this);
-
-
-        // Countdown timer if active
-        if (_hasTimer) {
-            long elapsed = StaticTimer.GetElapsedMilliseconds();
-            if (_lastTickTime + 1000 < elapsed) {
-                _timeRemaining = Math.Max(0, _timeRemaining - 1);
-                _lastTickTime += 1000;
-                if (_timeRemaining == 0) {
-                    _stateMachine.ActiveState = new GameLost(_stateMachine, _levelNumber, pointTracker.GetScore());
-                    return;
-                }
-            }
-        }
-        // Remove balls that fell below the screen
-        for (int i = activeBalls.Count - 1; i >= 0; i--) {
-            if (activeBalls[i].Shape.Position.Y <= 0.0f) {
-                activeBalls.RemoveAt(i);
-            }
-        }
-        // If no balls remain, lose a life or end game
-        if (activeBalls.Count == 0) {
-            _lives = Math.Max(0, _lives - 1);
-            if (_lives > 0) {
-                _ballLaunched = false;
-                _ball = CreateBall();
-                activeBalls.Add(_ball);
-            } else {
-                // No lives left -> game over
-                _stateMachine.ActiveState = new GameLost(_stateMachine, _levelNumber, pointTracker.GetScore());
-                return;
-            }
-        }
-        // Check win condition (all breakable blocks destroyed)
-        bool allBlocksDestroyed = _blocks
-            .Where(b => !(b is UnbreakableBlock))
-            .All(b => !b.IsAlive);
-        if (allBlocksDestroyed) {
-            int nextLevel = _levelNumber + 1;
-            try {
-                _stateMachine.ActiveState = new GameRunning(_stateMachine, nextLevel, pointTracker);
-            } catch (FileNotFoundException) {
-                // All levels completed -> main menu
-                _stateMachine.ActiveState = new GameWon(_stateMachine, _levelNumber, pointTracker.GetScore());
-            }
+        HandlePowerUps();
+        UpdateTimer();
+        if (_lives == 0)
             return;
-        }
-
+        RemoveOffscreenBalls();
+        HandleBallLoss();
+        if (_lives == 0)
+            return;
+        CheckWinCondition();
     }
 
     public void HandleKeyEvent(KeyboardAction action, KeyboardKey key) {
@@ -214,13 +159,89 @@ public class GameRunning : IGameState {
             } else {
                 _stateMachine.ActiveState = new GameWon(_stateMachine, _levelNumber, pointTracker.GetScore());
             }
-        } else if (action == KeyboardAction.KeyPress && key == KeyboardKey.Space && !_ballLaunched) {
+        } else if (action == KeyboardAction.KeyPress && key == KeyboardKey.Space && !_ballManager.BallLaunched) {
             float rx = (float) (random.NextDouble() * 1.0 - 0.5);
-            _ball.BallLaunch(new Vector2(rx, 1.0f));
-            _ballLaunched = true;
+            _ballManager.LaunchBall(new Vector2(rx, -1.0f));
         } else {
             _player.KeyHandler(action, key);
         }
+    }
+
+
+    private void MovePlayer() {
+        // Move player paddle based on input
+        _player.Move();
+    }
+
+    private void MoveBalls() {
+        // Move balls if launched
+        _ballManager.MoveBalls();
+    }
+
+
+    private void HandleCollisions() {
+        // Check collisions between balls and blocks, player, and hazards
+        _collisionManager.Update();
+    }
+
+    private void HandleHazards() {
+        // Update hazards and check for hazard-ball collisions
+        _hazardManager.Update(this);
+    }
+
+    private void HandlePowerUps() {
+        // Update power-up and check for power-up-player collisions
+        _powerUpManager.Update(this);
+    }
+
+    private void UpdateTimer() {
+        // Countdown timer if active
+        if (_hasTimer) {
+            long elapsed = StaticTimer.GetElapsedMilliseconds();
+            if (_lastTickTime + 1000 < elapsed) {
+                _timeRemaining = Math.Max(0, _timeRemaining - 1);
+                _lastTickTime += 1000;
+                if (_timeRemaining == 0) {
+                    _stateMachine.ActiveState = new GameLost(_stateMachine, _levelNumber, pointTracker.GetScore());
+                }
+            }
+        }
+    }
+
+    private void RemoveOffscreenBalls() {
+        // Remove balls that fell below the screen
+        for (int i = activeBalls.Count - 1; i >= 0; i--) {
+            if (activeBalls[i].Shape.Position.Y <= 0.0f) {
+                activeBalls.RemoveAt(i);
+            }
+        }
+    }
+
+    private void HandleBallLoss() {
+        _ballManager.RemoveOffscreenBalls();
+        if (_ballManager.Balls.Count == 0) {
+            _ballManager.ResetLaunch();
+            _ballManager.CreateBall();
+            } else {
+            // No lives left -> game over
+            _stateMachine.ActiveState = new GameLost(_stateMachine, _levelNumber, pointTracker.GetScore());
+        }
+    }
+    
+    private void CheckWinCondition() {
+        // Check win condition (all breakable blocks destroyed)
+        bool allBlocksDestroyed = _blocks
+                .Where(b => !(b is UnbreakableBlock))
+                .All(b => !b.IsAlive);
+            if (allBlocksDestroyed) {
+                int nextLevel = _levelNumber + 1;
+                try {
+                    _stateMachine.ActiveState = new GameRunning(_stateMachine, nextLevel, pointTracker);
+                } catch (FileNotFoundException) {
+                    // All levels completed -> main menu
+                    _stateMachine.ActiveState = new GameWon(_stateMachine, _levelNumber, pointTracker.GetScore());
+                }
+            }
     }
 
     public void ResetTimer() {
